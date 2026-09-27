@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOIR — Store & Admin</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111;background:#fff}button,input,select,textarea{font:inherit}button{cursor:pointer}
+nav{height:68px;border-bottom:1px solid #ddd;display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;background:#fff;z-index:10}.logo{font-weight:900;letter-spacing:5px;font-size:23px}.navlinks{display:flex;gap:22px}.navlinks a{color:#111;text-decoration:none;font-size:14px}.cart{position:relative;border:0;background:none;font-size:20px}.badge{position:absolute;top:-7px;right:-8px;background:#111;color:#fff;border-radius:50%;font-size:10px;width:17px;height:17px;line-height:17px}
+.hero{min-height:520px;color:#fff;padding:8%;display:flex;align-items:center;background:linear-gradient(90deg,#000b,#0002),url('https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1800&q=85') center/cover}.hero h1{font-size:clamp(48px,8vw,88px);line-height:.88;margin:0 0 20px}.hero p{max-width:480px;line-height:1.6}.btn{display:inline-block;background:#111;color:#fff;border:0;padding:14px 22px;font-weight:800;text-decoration:none}.white{background:#fff;color:#111}
+section{padding:65px 5%}.head{display:flex;justify-content:space-between;align-items:end;margin-bottom:25px}.head h2{margin:0;font-size:32px}.products{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.product{position:relative}.pic{height:410px;overflow:hidden;background:#eee}.pic img{width:100%;height:100%;object-fit:cover}.product h3{font-size:15px;margin:12px 0 6px}.price{font-weight:800}.add{margin-top:11px;width:100%;border:0;background:#111;color:#fff;padding:12px;font-weight:800}.tag{position:absolute;top:10px;left:10px;background:#fff;padding:7px 9px;font-size:10px;font-weight:900;z-index:1}
+.overlay{display:none;position:fixed;inset:0;background:#0008;z-index:30}.drawer{position:absolute;right:0;top:0;width:min(450px,100%);height:100%;background:#fff;padding:22px;overflow:auto}.close{border:0;background:none;font-size:28px}.row{display:flex;justify-content:space-between;align-items:center}.item{display:grid;grid-template-columns:70px 1fr auto;gap:10px;padding:14px 0;border-bottom:1px solid #ddd}.item img{width:70px;height:85px;object-fit:cover}.qty button{width:27px;height:27px;border:1px solid #ddd;background:#fff}.total{display:flex;justify-content:space-between;font-size:19px;font-weight:900;padding:18px 0}.green{background:#25d366;color:#fff;border:0;padding:15px;width:100%;font-weight:900}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:40;align-items:center;justify-content:center;padding:15px}.box{background:#fff;width:min(650px,100%);max-height:92vh;overflow:auto;padding:25px}.form{display:grid;gap:10px}.form input,.form select,.form textarea{padding:12px;border:1px solid #ccc}.form textarea{min-height:80px}.notice{font-size:12px;color:#666;line-height:1.5}
+.admin{display:none;background:#f5f5f5;min-height:100vh}.adminbar{background:#111;color:#fff;padding:18px 5%;display:flex;justify-content:space-between;align-items:center}.adminmain{padding:35px 5%}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.tab{border:1px solid #ccc;background:#fff;padding:11px 16px}.tab.active{background:#111;color:#fff}.panel{background:#fff;padding:22px;margin-bottom:20px}.adminproducts{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.admincard{border:1px solid #ddd;padding:12px}.admincard img{width:100%;height:180px;object-fit:cover}.admincard button,.danger{border:0;padding:9px 12px;margin:5px 5px 0 0;background:#111;color:#fff}.danger{background:#b00020;color:#fff}.orders{display:grid;gap:12px}.order{border:1px solid #ddd;padding:16px}.order pre{white-space:pre-wrap;font-family:inherit}.status{padding:7px}.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:#fff;padding:18px;border:1px solid #ddd}.stat b{font-size:25px;display:block;margin-top:5px}
+@media(max-width:850px){.navlinks{display:none}.products{grid-template-columns:repeat(2,1fr)}.adminproducts{grid-template-columns:1fr 1fr}.statgrid{grid-template-columns:1fr 1fr}.pic{height:320px}}
+@media(max-width:520px){.products{grid-template-columns:1fr 1fr;gap:10px}.pic{height:240px}.adminproducts{grid-template-columns:1fr}.statgrid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="store">
+<nav><div class="logo">NOIR</div><div class="navlinks"><a href="#shop">Shop</a><a href="#about">About</a><a href="#shop">New Arrivals</a></div><button class="cart" onclick="openCart()">🛒<span class="badge" id="count">0</span></button></nav>
+<header class="hero"><div><h1>OWN<br>YOUR<br>STYLE.</h1><p>Premium streetwear built around oversized silhouettes, relaxed fits and everyday confidence.</p><a class="btn white" href="#shop">SHOP NOW</a></div></header>
+<section id="shop"><div class="head"><h2>Shop Collection</h2></div><div class="products" id="products"></div></section>
+<section id="about"><div class="panel"><h2>NOIR</h2><p>Premium streetwear. Fast delivery. Cash on Delivery available.</p></div></section>
+<footer style="background:#111;color:#aaa;padding:40px 5%"><b style="color:#fff;letter-spacing:4px">NOIR</b><p>© 2026 NOIR Clothing</p><button class="btn" onclick="adminLogin()">🔐 Admin Login</button></footer>
+</div>
+
+<div id="admin" class="admin">
+<div class="adminbar"><b>NOIR ADMIN</b><button class="btn" onclick="showStore()">View Store</button></div>
+<div class="adminmain"><p class="notice"><b>Admin:</b> Add products, manage your catalog, and view COD orders. Admin password has been strengthened.</p><div class="statgrid"><div class="stat">Products<b id="sProducts">0</b></div><div class="stat">Orders<b id="sOrders">0</b></div><div class="stat">Pending<b id="sPending">0</b></div><div class="stat">COD Sales<b id="sSales">₹0</b></div></div>
+<div class="tabs"><button class="tab active" onclick="adminTab('productsTab',this)">Products</button><button class="tab" onclick="adminTab('ordersTab',this)">Orders</button><button class="tab" onclick="adminTab('settingsTab',this)">Settings</button></div>
+<div id="productsTab" class="panel"><h2>Add New Product</h2><form class="form" onsubmit="saveProduct(event)"><input id="pname" placeholder="Product name" required><input id="pprice" type="number" min="0" placeholder="Price ₹" required><input id="pimage" placeholder="Product image URL" required><select id="pcat"><option>Baggy Jeans</option><option>Oversized T-Shirt</option><option>Shirt</option><option>Jacket</option><option>Other</option></select><input id="psizes" placeholder="Sizes e.g. S,M,L,XL,XXL" value="S,M,L,XL,XXL"><button class="btn">ADD PRODUCT</button></form><hr><h2>Your Products</h2><div id="adminProducts" class="adminproducts"></div></div>
+<div id="ordersTab" class="panel" style="display:none"><h2>📦 Order Inbox — Customer Orders</h2><p class="notice"><b>Order details:</b> customer, delivery address, products, quantities, size, payment, total and status. You can delete an order when needed. Your Admin product list also shows the product photos. Orders placed through this website are saved in this browser's Admin order list. For a real multi-device business admin, connect this site to a cloud database/backend.</p><div id="adminOrders" class="orders"></div></div>
+
+<div id="settingsTab" class="panel" style="display:none">
+<h2>⚙️ Store Settings</h2>
+<p class="notice">Enter the WhatsApp number that should receive customer orders. Use country code, without + or spaces. Example: 919876543210</p>
+<form class="form" onsubmit="saveSettings(event)">
+<input id="waNumber" placeholder="91XXXXXXXXXX" inputmode="numeric" required>
+<button class="btn">SAVE WHATSAPP NUMBER</button>
+</form>
+<p id="settingsSaved" class="notice"></p>
+<hr>
+<h3>🔐 Admin Password</h3>
+<p class="notice">Current demo password: <b>Noir@2026#Store91</b>. For a real public store, use server-side authentication rather than a password embedded in HTML.</p>
+</div>
+</div></div>
+
+<div class="overlay" id="cartOverlay" onclick="if(event.target===this)closeCart()"><aside class="drawer"><div class="row"><h2>Your Cart</h2><button class="close" onclick="closeCart()">×</button></div><div id="cartItems"></div><div id="cartTotal"></div></aside></div>
+<div class="modal" id="checkout"><div class="box"><div class="row"><h2>Checkout — Cash on Delivery</h2><button class="close" onclick="closeCheckout()">×</button></div><p class="notice">Your order is recorded on this device and can be viewed in Admin. WhatsApp will also open with the order details.</p><form class="form" onsubmit="placeOrder(event)">
+<input id="cname" placeholder="Full Name" required>
+<input id="cphone" placeholder="Mobile Number" inputmode="tel" required>
+<input id="chouse" placeholder="House / Flat / Building" required>
+<input id="cstreet" placeholder="Street / Area / Locality" required>
+<input id="clandmark" placeholder="Landmark (optional)">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<input id="ccity" placeholder="City" required>
+<input id="cstate" placeholder="State" required>
+</div>
+<input id="cpin" placeholder="PIN Code" inputmode="numeric" required>
+<select id="csize" required><option value="">Select Size</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+<button class="green">🛍️ PLACE ORDER — CASH ON DELIVERY</button>
+</form></div></div>
+
+
+<div class="modal" id="success">
+<div class="box" style="text-align:center;max-width:520px;border-radius:16px;padding:32px 24px">
+<div style="width:72px;height:72px;border-radius:50%;background:#e9f9ef;color:#19a653;font-size:42px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">✓</div>
+<h2 style="font-size:30px;margin:0 0 10px">Order Placed Successfully</h2>
+<p style="font-size:16px;color:#555;line-height:1.6;margin:0 0 20px">Thank you for shopping with NOIR. Your Cash on Delivery order has been received.</p>
+<div style="background:#f7f7f7;border-radius:10px;padding:16px;text-align:left">
+<div style="display:flex;justify-content:space-between;gap:15px;margin-bottom:9px"><span style="color:#666">Order ID</span><b id="successId"></b></div>
+<div style="display:flex;justify-content:space-between;gap:15px"><span style="color:#666">Payment</span><b style="color:#168a3b">Cash on Delivery</b></div>
+</div>
+<p style="font-size:13px;color:#777;line-height:1.5;margin:18px 0 22px">Please keep your phone available for delivery updates.</p>
+<button class="btn" style="width:100%;border-radius:7px" onclick="closeSuccess()">CONTINUE SHOPPING</button>
+</div></div>
+<div class="modal" id="productView"><div class="box">
+<div class="row"><h2 id="viewName">Product</h2><button class="close" onclick="closeProduct()">×</button></div>
+<img id="viewImage" src="" style="width:100%;max-height:420px;object-fit:contain;background:#f5f5f5">
+<p id="viewCategory"></p><h2 id="viewPrice"></h2><p id="viewSizes"></p>
+<button class="green" id="viewBuy">BUY — CASH ON DELIVERY</button>
+</div></div><script>
+let WA=localStorage.getItem("NOIR_WA")||"";
+const KEY="NOIR_STORE_V2";
+const defaultProducts=[
+{id:"1",name:"NOIR Baggy Jeans",price:2499,image:"https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=900&q=85",cat:"Baggy Jeans",sizes:["S","M","L","XL","XXL"]},
+{id:"2",name:"Essential Oversized Shirt",price:1899,image:"https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=85",cat:"Shirt",sizes:["S","M","L","XL","XXL"]},
+{id:"3",name:"Heavyweight Oversized T-Shirt",price:1299,image:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=85",cat:"Oversized T-Shirt",sizes:["S","M","L","XL","XXL"]},
+{id:"4",name:"Relaxed Street Jacket",price:3499,image:"https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=85",cat:"Jacket",sizes:["S","M","L","XL","XXL"]}
+];
+let data=JSON.parse(localStorage.getItem(KEY)||"null")||{products:defaultProducts,orders:[]};
+let cart={};
+function persist(){localStorage.setItem(KEY,JSON.stringify(data))}
+function renderProducts(){document.getElementById("products").innerHTML=data.products.map(p=>`<article class="product">
+<div class="pic"><img src="${p.image}" alt="${p.name}"></div>
+<h3>${p.name}</h3><div class="price">₹${p.price.toLocaleString()}</div>
+<select id="size_${p.id}" style="width:100%;padding:11px;border:1px solid #ccc;margin-top:10px">
+<option value="">Select Size</option>${p.sizes.map(z=>`<option>${z}</option>`).join("")}
+</select>
+<button class="add" onclick="viewProduct('${p.id}')">VIEW PRODUCT</button><button class="add" onclick="buy('${p.id}')">BUY NOW — CASH ON DELIVERY</button>
+<button class="add" style="background:#fff;color:#111;border:1px solid #111" onclick="add('${p.id}')">ADD TO CART</button>
+</article>`).join("")}
+function viewProduct(id){
+ const p=data.products.find(x=>x.id===id); if(!p)return;
+ document.getElementById("viewName").textContent=p.name;
+ document.getElementById("viewImage").src=p.image;
+ document.getElementById("viewCategory").textContent=p.cat;
+ document.getElementById("viewPrice").textContent="₹"+p.price.toLocaleString();
+ document.getElementById("viewSizes").textContent="Available sizes: "+p.sizes.join(" · ");
+ document.getElementById("viewBuy").onclick=()=>{closeProduct();buy(id)};
+ document.getElementById("productView").style.display="flex";
+}
+function closeProduct(){document.getElementById("productView").style.display="none"}
+function buy(id){
+ const size=document.getElementById("size_"+id)?.value;
+ if(!size){alert("Please select a size first.");return}
+ cart={}; cart[id]=1; window.__selectedSize=size; openCheckout();
+}
+function add(id){cart[id]=(cart[id]||0)+1;renderCart();openCart()}
+function change(id,n){cart[id]=(cart[id]||0)+n;if(cart[id]<=0)delete cart[id];renderCart()}
+function renderCart(){let n=Object.values(cart).reduce((a,b)=>a+b,0);document.getElementById("count").textContent=n;let box=document.getElementById("cartItems");if(!n){box.innerHTML="<p>Your cart is empty.</p>";document.getElementById("cartTotal").innerHTML="";return}let total=0;box.innerHTML=Object.entries(cart).map(([id,q])=>{let p=data.products.find(x=>x.id===id);if(!p)return"";total+=p.price*q;return`<div class="item"><img src="${p.image}"><div><b>${p.name}</b><div>₹${p.price.toLocaleString()}</div><div class="qty"><button onclick="change('${id}',-1)">−</button> ${q} <button onclick="change('${id}',1)">+</button></div></div><button onclick="delete cart['${id}'];renderCart()">×</button></div>`}).join("");document.getElementById("cartTotal").innerHTML=`<div class="total"><span>Total</span><span>₹${total.toLocaleString()}</span></div><button class="green" onclick="openCheckout()">CHECKOUT — CASH ON DELIVERY</button>`}
+function openCart(){document.getElementById("cartOverlay").style.display="block";renderCart()}function closeCart(){document.getElementById("cartOverlay").style.display="none"}
+function openCheckout(){if(!Object.keys(cart).length)return;closeCart();document.getElementById("checkout").style.display="flex"}function closeCheckout(){document.getElementById("checkout").style.display="none"}
+function placeOrder(e){
+  e.preventDefault();
+
+  if(!Object.keys(cart).length){
+    alert("Your cart is empty.");
+    closeCheckout();
+    return;
+  }
+
+  const name=document.getElementById("cname").value.trim();
+  const phone=document.getElementById("cphone").value.trim();
+  const house=document.getElementById("chouse").value.trim();
+  const street=document.getElementById("cstreet").value.trim();
+  const landmark=document.getElementById("clandmark").value.trim();
+  const city=document.getElementById("ccity").value.trim();
+  const state=document.getElementById("cstate").value.trim();
+  const pin=document.getElementById("cpin").value.trim();
+  const size=(window.__selectedSize || document.getElementById("csize").value).trim();
+
+  if(!name||!phone||!house||!street||!city||!state||!pin||!size){
+    alert("Please complete all required details.");
+    return;
+  }
+
+  const items=[];
+  let total=0;
+  for(const [id,q] of Object.entries(cart)){
+    const p=data.products.find(x=>x.id===id);
+    if(!p) continue;
+    const lineTotal=p.price*q;
+    total+=lineTotal;
+    items.push({
+      id:p.id,
+      name:p.name,
+      price:p.price,
+      quantity:q,
+      size:size,
+      image:p.image,
+      lineTotal:lineTotal
+    });
+  }
+
+  if(!items.length){
+    alert("The selected product is no longer available.");
+    return;
+  }
+
+  const order={
+    id:"NOIR-"+Date.now().toString().slice(-7),
+    date:new Date().toLocaleString(),
+    name:name,
+    phone:phone,
+    address:{
+      house:house,
+      street:street,
+      landmark:landmark
+    },
+    city:city,
+    state:state,
+    pin:pin,
+    size:size,
+    items:items,
+    total:total,
+    status:"Pending",
+    payment:"Cash on Delivery"
+  };
+
+  data.orders.unshift(order);
+  persist();
+
+  // Clear the cart only after the order has been successfully saved.
+  cart={};
+  window.__selectedSize="";
+  renderCart();
+  closeCheckout();
+
+  // Show a clear customer confirmation.
+  document.getElementById("successId").textContent=order.id;
+  document.getElementById("success").style.display="flex";
+
+  // Send the same order to the store WhatsApp when a number has been configured.
+  if(WA){
+    const productLines=items.map(x =>
+      `• ${x.name} × ${x.quantity} — ₹${x.lineTotal.toLocaleString()} — Size ${x.size}`
+    ).join("\n");
+
+    const fullAddress=[
+      order.address.house,
+      order.address.street,
+      order.address.landmark
+    ].filter(Boolean).join(", ") + `, ${order.city}, ${order.state} - ${order.pin}`;
+
+    const text=
+`NEW NOIR ORDER
+Order ID: ${order.id}
+
+CUSTOMER
+Name: ${order.name}
+Phone: ${order.phone}
+
+DELIVERY ADDRESS
+${fullAddress}
+
+PRODUCTS
+${productLines}
+
+PAYMENT: CASH ON DELIVERY
+TOTAL: ₹${order.total.toLocaleString()}`;
+
+    setTimeout(()=>{
+      window.location.href=`https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
+    },700);
+  }
+}
+
+function closeSuccess(){document.getElementById("success").style.display="none"}
+function saveSettings(e){
+e.preventDefault();
+let n=document.getElementById("waNumber").value.replace(/\D/g,"");
+if(!n){alert("Enter a valid WhatsApp number.");return}
+WA=n;localStorage.setItem("NOIR_WA",WA);
+document.getElementById("settingsSaved").textContent="✅ WhatsApp number saved.";
+}
+function adminLogin(){let p=prompt("Enter Admin Password");if(p==="Noir@2026#Store91"){document.getElementById("store").style.display="none";document.getElementById("admin").style.display="block";renderAdmin()}else alert("Wrong password. Change the admin password in the code before launch.")}
+function showStore(){document.getElementById("admin").style.display="none";document.getElementById("store").style.display="block"}
+function adminTab(id,btn){
+document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+btn.classList.add("active");
+["productsTab","ordersTab","settingsTab"].forEach(x=>document.getElementById(x).style.display=x===id?"block":"none");
+if(id==="settingsTab")document.getElementById("waNumber").value=WA;
+}
+function saveProduct(e){e.preventDefault();data.products.push({id:Date.now().toString(),name:pname.value,price:Number(pprice.value),image:pimage.value,cat:pcat.value,sizes:psizes.value.split(",").map(x=>x.trim()).filter(Boolean)});persist();e.target.reset();renderAdmin();renderProducts();alert("Product added.")}
+function deleteProduct(id){if(confirm("Delete this product?")){data.products=data.products.filter(p=>p.id!==id);persist();renderAdmin();renderProducts()}}
+function updateStatus(id,status){let o=data.orders.find(x=>x.id===id);if(o){o.status=status;persist();renderAdmin()}}
+function deleteOrder(id){
+  const order=data.orders.find(o=>o.id===id);
+  if(!order)return;
+  if(confirm("Delete order "+id+"? This cannot be undone.")){
+    data.orders=data.orders.filter(o=>o.id!==id);
+    persist();
+    renderAdmin();
+  }
+}
+function renderAdmin(){
+  document.getElementById("sProducts").textContent=data.products.length;
+  document.getElementById("sOrders").textContent=data.orders.length;
+  document.getElementById("sPending").textContent=data.orders.filter(o=>o.status==="Pending").length;
+  document.getElementById("sSales").textContent="₹"+data.orders.reduce((a,o)=>a+o.total,0).toLocaleString();
+
+  document.getElementById("adminProducts").innerHTML=data.products.map(p=>`
+    <div class="admincard">
+      <img src="${p.image}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <b>₹${p.price.toLocaleString()}</b>
+      <p>${p.cat} · ${p.sizes.join(", ")}</p>
+      <button class="danger" onclick="deleteProduct('${p.id}')">Delete</button>
+    </div>`).join("");
+
+  document.getElementById("adminOrders").innerHTML=data.orders.length ? data.orders.map(o=>{
+    const address = typeof o.address==="object"
+      ? [o.address.house,o.address.street,o.address.landmark].filter(Boolean).join(", ")
+      : o.address;
+    const cityLine = [o.city,o.state,o.pin].filter(Boolean).join(", ");
+    const productHtml = (o.items||[]).map(item=>{
+      const name = typeof item==="string" ? item : item.name;
+      const qty = typeof item==="string" ? "" : ` × ${item.quantity}`;
+      const price = typeof item==="string" ? "" : ` — ₹${Number(item.lineTotal).toLocaleString()}`;
+      const image = typeof item==="string" ? "" : `<img src="${item.image}" style="width:58px;height:70px;object-fit:cover;border-radius:5px;vertical-align:middle;margin-right:10px">`;
+      return `<div style="display:flex;align-items:center;padding:9px 0;border-bottom:1px solid #eee">${image}<span>• ${name}${qty}${price}</span></div>`;
+    }).join("");
+
+    return `<div class="order" style="border:1px solid #ddd;border-radius:10px;padding:18px;margin-bottom:14px;background:#fff">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <b style="font-size:18px">${o.id}</b><span>${o.date}</span>
+      </div>
+      <hr>
+      <h3>👤 Customer</h3>
+      <div><b>${o.name}</b><br>📞 ${o.phone}</div>
+      <h3>📍 Delivery Address</h3>
+      <div style="line-height:1.7">${address}<br>${cityLine}</div>
+      <h3>🛍️ Products Ordered</h3>
+      <div>${productHtml}</div>
+      <p><b>Size:</b> ${o.size||"Not specified"} &nbsp; <b>Payment:</b> <span style="color:#138a3d;font-weight:800">CASH ON DELIVERY</span></p>
+      <div style="font-size:21px;font-weight:900;margin:16px 0">TOTAL: ₹${Number(o.total).toLocaleString()}</div>
+      <b>Order status:</b><br>
+      <select class="status" style="margin-top:7px;padding:10px" onchange="updateStatus('${o.id}',this.value)">
+        <option ${o.status==="Pending"?"selected":""}>Pending</option>
+        <option ${o.status==="Confirmed"?"selected":""}>Confirmed</option>
+        <option ${o.status==="Shipped"?"selected":""}>Shipped</option>
+        <option ${o.status==="Delivered"?"selected":""}>Delivered</option>
+        <option ${o.status==="Cancelled"?"selected":""}>Cancelled</option>
+      </select>
+      <button class="danger" style="margin-top:12px" onclick="deleteOrder('${o.id}')">🗑️ DELETE ORDER</button>
+    </div>`;
+  }).join("") : "<p>No orders yet.</p>";
+}
+renderProducts();renderCart();
+</script>
+</body></html>
